@@ -1,10 +1,9 @@
-
 import {
   getTasks,
   saveTasks,
   getUser,
   saveUser,
-  clearUser
+  clearUser,
 } from "./storage.js";
 
 const loginSection = document.querySelector("#login-section");
@@ -91,9 +90,7 @@ function renderTasks() {
       : "Mark Completed";
     toggleButton.addEventListener("click", () => {
       const updatedTasks = tasks.map((item) =>
-        item.id === task.id
-          ? { ...item, completed: !item.completed }
-          : item
+        item.id === task.id ? { ...item, completed: !item.completed } : item,
       );
 
       persistTasks(updatedTasks);
@@ -106,7 +103,22 @@ function renderTasks() {
       openEditTaskDialog(task);
     });
 
-    actions.append(toggleButton, editButton);
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", () => {
+      const confirmed = window.confirm(
+        "Are you sure you want to delete this task?",
+      );
+
+      if (!confirmed) return;
+
+      const updatedTasks = tasks.filter((item) => item.id !== task.id);
+
+      persistTasks(updatedTasks);
+    });
+
+    actions.append(toggleButton, editButton, deleteButton);
     card.append(title, description, status, actions);
     taskList.append(card);
   });
@@ -200,9 +212,7 @@ taskForm.addEventListener("submit", (event) => {
 
   if (editingTaskId) {
     const updatedTasks = tasks.map((task) =>
-      task.id === editingTaskId
-        ? { ...task, title, description }
-        : task
+      task.id === editingTaskId ? { ...task, title, description } : task,
     );
 
     if (!persistTasks(updatedTasks)) {
@@ -214,7 +224,7 @@ taskForm.addEventListener("submit", (event) => {
       title,
       description,
       completed: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     if (!persistTasks([...tasks, newTask])) {
