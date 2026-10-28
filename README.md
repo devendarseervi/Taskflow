@@ -85,14 +85,14 @@ The login functionality is a demonstration only. It simulates a user session usi
 
 ## Testing Checklist
 
-- [ ] Login and logout work.
-- [ ] Tasks can be created, viewed, edited, and deleted.
-- [ ] Task completion status can be changed.
-- [ ] Dashboard statistics update correctly.
-- [ ] Search and status filters work together.
-- [ ] Task data persists after refreshing the page.
-- [ ] The interface remains usable at smaller screen sizes.
-- [ ] No unexpected browser console errors occur.
+- [x] Login and logout work.
+- [x] Tasks can be created, viewed, edited, and deleted.
+- [x] Task completion status can be changed.
+- [x] Dashboard statistics update correctly.
+- [x] Search and status filters work together.
+- [x] Task data persists after refreshing the page.
+- [x] The interface remains usable at smaller screen sizes.
+- [X] No unexpected browser console errors occur.
 
 ## Project Status
 
