@@ -25,6 +25,7 @@ const taskList = document.querySelector("#task-list");
 const taskStatus = document.querySelector("#task-status");
 
 let tasks = getTasks();
+let editingTaskId = null;
 
 function showDashboard(user) {
   loginSection.hidden = true;
@@ -38,6 +39,18 @@ function showLogin() {
   dashboardSection.hidden = true;
   logoutButton.hidden = true;
   loginMessage.textContent = "";
+}
+
+function persistTasks(updatedTasks) {
+  if (!saveTasks(updatedTasks)) {
+    taskStatus.textContent =
+      "Unable to save changes. Browser storage may be full or unavailable.";
+    return false;
+  }
+
+  tasks = updatedTasks;
+  renderTasks();
+  return true;
 }
 
 function renderTasks() {
@@ -57,16 +70,63 @@ function renderTasks() {
     const title = document.createElement("h3");
     title.textContent = task.title;
 
+    if (task.completed) {
+      title.classList.add("task-completed");
+    }
+
     const description = document.createElement("p");
     description.textContent = task.description || "No description provided.";
 
-    card.append(title, description);
+    const status = document.createElement("p");
+    status.textContent = task.completed ? "Completed" : "Pending";
+    status.className = "task-status-label";
+
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
+
+    const toggleButton = document.createElement("button");
+    toggleButton.type = "button";
+    toggleButton.textContent = task.completed
+      ? "Mark Pending"
+      : "Mark Completed";
+    toggleButton.addEventListener("click", () => {
+      const updatedTasks = tasks.map((item) =>
+        item.id === task.id
+          ? { ...item, completed: !item.completed }
+          : item
+      );
+
+      persistTasks(updatedTasks);
+    });
+
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.textContent = "Edit";
+    editButton.addEventListener("click", () => {
+      openEditTaskDialog(task);
+    });
+
+    actions.append(toggleButton, editButton);
+    card.append(title, description, status, actions);
     taskList.append(card);
   });
 }
 
 function openNewTaskDialog() {
+  editingTaskId = null;
   taskForm.reset();
+  document.querySelector("#task-dialog-title").textContent = "Add a Task";
+  taskForm.querySelector('button[type="submit"]').textContent = "Save Task";
+  taskDialog.showModal();
+  taskTitleInput.focus();
+}
+
+function openEditTaskDialog(task) {
+  editingTaskId = task.id;
+  taskTitleInput.value = task.title;
+  taskDescriptionInput.value = task.description || "";
+  document.querySelector("#task-dialog-title").textContent = "Edit Task";
+  taskForm.querySelector('button[type="submit"]').textContent = "Save Changes";
   taskDialog.showModal();
   taskTitleInput.focus();
 }
@@ -138,26 +198,37 @@ taskForm.addEventListener("submit", (event) => {
     return;
   }
 
-  const newTask = {
-    id: crypto.randomUUID(),
-    title,
-    description,
-    completed: false,
-    createdAt: new Date().toISOString()
-  };
+  if (editingTaskId) {
+    const updatedTasks = tasks.map((task) =>
+      task.id === editingTaskId
+        ? { ...task, title, description }
+        : task
+    );
 
-  const updatedTasks = [...tasks, newTask];
+    if (!persistTasks(updatedTasks)) {
+      return;
+    }
+  } else {
+    const newTask = {
+      id: crypto.randomUUID(),
+      title,
+      description,
+      completed: false,
+      createdAt: new Date().toISOString()
+    };
 
-  if (!saveTasks(updatedTasks)) {
-    taskStatus.textContent =
-      "Unable to save this task. Browser storage may be full or unavailable.";
-    return;
+    if (!persistTasks([...tasks, newTask])) {
+      return;
+    }
   }
 
-  tasks = updatedTasks;
-  renderTasks();
   taskDialog.close();
   taskForm.reset();
+  editingTaskId = null;
+});
+
+taskDialog.addEventListener("close", () => {
+  editingTaskId = null;
 });
 
 initializeApp();
