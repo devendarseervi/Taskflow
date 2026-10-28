@@ -345,3 +345,67 @@ textarea::placeholder {
     width: 100%;
   }
 }
+
+
+/* Task action buttons */
+.task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.task-actions button {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  background-color: #1e293b;
+  color: #f8fafc;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.task-actions button:hover {
+  background-color: #334155;
+  border-color: #64748b;
+}
+
+.task-actions button:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 3px;
+}
+
+.task-actions button:active {
+  transform: translateY(1px);
+}
+
+/* Primary action: complete or reopen a task */
+.task-actions button:first-child {
+  background-color: #818cf8;
+  border-color: #818cf8;
+  color: #0f172a;
+}
+
+.task-actions button:first-child:hover {
+  background-color: #6366f1;
+  border-color: #6366f1;
+  color: #ffffff;
+}
+
+/* Delete action */
+.task-actions button:last-child {
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+.task-actions button:last-child:hover {
+  background-color: #7f1d1d;
+  border-color: #991b1b;
+  color: #ffffff;
+}

@@ -23,6 +23,13 @@ const cancelTaskButton = document.querySelector("#cancel-task-button");
 const taskList = document.querySelector("#task-list");
 const taskStatus = document.querySelector("#task-status");
 
+const totalTasksCount = document.querySelector("#total-tasks");
+const pendingTasksCount = document.querySelector("#pending-tasks");
+const completedTasksCount = document.querySelector("#completed-tasks");
+const taskSearchInput = document.querySelector("#task-search");
+const taskFilterSelect = document.querySelector("#task-filter");
+
+
 let tasks = getTasks();
 let editingTaskId = null;
 
@@ -52,7 +59,34 @@ function persistTasks(updatedTasks) {
   return true;
 }
 
+
 function renderTasks() {
+  // Update dashboard statistics using all tasks.
+  const total = tasks.length;
+  const completed = tasks.filter((task) => task.completed).length;
+  const pending = total - completed;
+
+  totalTasksCount.textContent = total;
+  pendingTasksCount.textContent = pending;
+  completedTasksCount.textContent = completed;
+
+  // Apply search and status filter to the displayed tasks.
+  const searchTerm = taskSearchInput.value.trim().toLowerCase();
+  const selectedFilter = taskFilterSelect.value;
+
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch =
+      task.title.toLowerCase().includes(searchTerm) ||
+      (task.description || "").toLowerCase().includes(searchTerm);
+
+    const matchesFilter =
+      selectedFilter === "all" ||
+      (selectedFilter === "pending" && !task.completed) ||
+      (selectedFilter === "completed" && task.completed);
+
+    return matchesSearch && matchesFilter;
+  });
+
   taskList.replaceChildren();
 
   if (tasks.length === 0) {
@@ -60,9 +94,14 @@ function renderTasks() {
     return;
   }
 
+  if (filteredTasks.length === 0) {
+    taskStatus.textContent = "No tasks match your search or filter.";
+    return;
+  }
+
   taskStatus.textContent = "";
 
-  tasks.forEach((task) => {
+  filteredTasks.forEach((task) => {
     const card = document.createElement("article");
     card.className = "task-card";
 
@@ -74,7 +113,8 @@ function renderTasks() {
     }
 
     const description = document.createElement("p");
-    description.textContent = task.description || "No description provided.";
+    description.textContent =
+      task.description || "No description provided.";
 
     const status = document.createElement("p");
     status.textContent = task.completed ? "Completed" : "Pending";
@@ -88,9 +128,12 @@ function renderTasks() {
     toggleButton.textContent = task.completed
       ? "Mark Pending"
       : "Mark Completed";
+
     toggleButton.addEventListener("click", () => {
       const updatedTasks = tasks.map((item) =>
-        item.id === task.id ? { ...item, completed: !item.completed } : item,
+        item.id === task.id
+          ? { ...item, completed: !item.completed }
+          : item
       );
 
       persistTasks(updatedTasks);
@@ -108,12 +151,14 @@ function renderTasks() {
     deleteButton.textContent = "Delete";
     deleteButton.addEventListener("click", () => {
       const confirmed = window.confirm(
-        "Are you sure you want to delete this task?",
+        "Are you sure you want to delete this task?"
       );
 
       if (!confirmed) return;
 
-      const updatedTasks = tasks.filter((item) => item.id !== task.id);
+      const updatedTasks = tasks.filter(
+        (item) => item.id !== task.id
+      );
 
       persistTasks(updatedTasks);
     });
@@ -123,6 +168,7 @@ function renderTasks() {
     taskList.append(card);
   });
 }
+
 
 function openNewTaskDialog() {
   editingTaskId = null;
@@ -188,6 +234,9 @@ logoutButton.addEventListener("click", () => {
 });
 
 addTaskButton.addEventListener("click", openNewTaskDialog);
+
+taskSearchInput.addEventListener("input", renderTasks);
+taskFilterSelect.addEventListener("change", renderTasks);
 
 cancelTaskButton.addEventListener("click", () => {
   taskDialog.close();
