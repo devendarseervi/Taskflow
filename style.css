@@ -409,3 +409,50 @@ textarea::placeholder {
   border-color: #991b1b;
   color: #ffffff;
 }
+
+
+/* ---------- Task cards ---------- */
+.task-card {
+  margin-bottom: 16px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+  overflow-wrap: anywhere;
+}
+
+.task-card h3 {
+  margin-bottom: 10px;
+  font-size: 1.15rem;
+  letter-spacing: -0.2px;
+}
+
+.task-card p {
+  margin-bottom: 12px;
+}
+
+.task-card p:last-of-type {
+  margin-bottom: 0;
+}
+
+.task-card .task-status-label {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  background: #0f172a;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.task-card .task-completed {
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.task-card .task-actions {
+  margin-top: 16px;
+}
